@@ -24,7 +24,8 @@ public class PlayerNamerDisplay : MonoBehaviour {
 	void OnGUI()
 	{
 		Vector3 screenPos = Camera.allCameras[0].WorldToScreenPoint(transform.root.position);
-		playerName.pixelOffset = new Vector2(screenPos.x - Camera.allCameras[0].pixelWidth*.5f, screenPos.y - Camera.allCameras[0].pixelHeight*.5f);
+		playerName.pixelOffset = new Vector2(screenPos.x - Camera.allCameras[0].pixelWidth*.5f, 
+											 screenPos.y - Camera.allCameras[0].pixelHeight*.5f);
 		Debug.Log(playerName.pixelOffset);
 	}
 }

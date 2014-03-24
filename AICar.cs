@@ -128,38 +128,39 @@ public class AICar : AbstractCar {
 
 	public override void Throttle_Physics(float deltaY)
 	{
-		//engineRPM = colliders[3].rpm * GearRatios[gear-1];			
 		float airDrag = speed_MPS * speed_MPS * 0.3f * wheelRadius;		// Calculate air resistance.
 
 		engineRPM = 5000.0f;
 		engineTorque = LookupTorqueCurve(engineRPM);
 
 		UpdateCurrentState();
-		if(currentState == State.Stop)	// Stop state
-		{
+		if(currentState == State.Stop)
+		{	// Stop state
 			if(deltaY >= 0.05f)
 			{
 				gear = ShiftGear(speed_KMP);			
 				wheelTorque = ((engineTorque * deltaY) * GearRatios[gear-1] - airDrag) * 0.25f;
-			}else if(deltaY <= -0.05f)
+			}
+			else if(deltaY <= -0.05f)
 			{
 	 			gear = GearRatios.Length;
 				wheelTorque = -((engineTorque * deltaY) * GearRatios[gear-1]- airDrag) * 0.25f;			
-			}else{
+			}
+			else
+			{
 				gear = 0;
 				wheelTorque = 0.0f;				
 			}
-		}else if(currentState == State.Reverse)	// Reverse state
-		{
-//			if(deltaY <= 0.0f){
-	 			gear = GearRatios.Length;
-				wheelTorque = -((engineTorque * deltaY) * GearRatios[gear-1]- airDrag) * 0.25f;		
-//			}
-		}else{	// Forward state
-//			if(deltaY >= 0.0f){
-				gear = ShiftGear(speed_KMP);			
-				wheelTorque = ((engineTorque * deltaY) * GearRatios[gear-1] - airDrag) * 0.25f;
-//			}
+		}
+		else if(currentState == State.Reverse)	
+		{	// Reverse state
+ 			gear = GearRatios.Length;
+			wheelTorque = -((engineTorque * deltaY) * GearRatios[gear-1]- airDrag) * 0.25f;		
+		}
+		else
+		{	// Forward state
+			gear = ShiftGear(speed_KMP);			
+			wheelTorque = ((engineTorque * deltaY) * GearRatios[gear-1] - airDrag) * 0.25f;
 		}
 
 		for(int i=0; i<wheels.Length; i++)
@@ -168,7 +169,8 @@ public class AICar : AbstractCar {
 
 	public override void Brake_Physics()
 	{
-		if(braked){
+		if(braked)
+		{
 			for(int i=0; i<wheels.Length; i++)
 			{
 				if(wheels[i].canSteer)
@@ -176,7 +178,8 @@ public class AICar : AbstractCar {
 				else
 					wheels[i].collider.brakeTorque = brakeForce;
 			}
-		}else
+		}
+		else
 		{
 			for(int j=0; j<wheels.Length; j++)
 			{

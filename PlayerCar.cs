@@ -18,9 +18,6 @@ public class PlayerCar : AbstractCar {
 	private bool isHorn;
 	private Vector3 lastForwardDir;
 	private float timer;
-	// private Vector3 toPosition;
-	// private Quaternion toRotation;
-	// private Vector3 toVelocity;
 
 	class Wheel{
 		public WheelCollider collider;
@@ -33,10 +30,6 @@ public class PlayerCar : AbstractCar {
 	void Start () {
 
 		base.Init();
-
-		// toPosition = rigidbody.position;
-		// toRotation = rigidbody.rotation;
-		// toVelocity = rigidbody.velocity;
 
 		if(!networkView.isMine)
 		{
@@ -84,16 +77,6 @@ public class PlayerCar : AbstractCar {
 		}
 
 	}
-
-/* 	void OnFixedUpdate()
-	{
-		if(isRemoteControlled)
-		{
-			rigidbody.position = Vector3.Lerp(rigidbody.position, toPosition, 0.8f);
-			rigidbody.rotation = Quaternion.Lerp(rigidbody.rotation, toRotation, 0.8f);
-			rigidbody.velocity = Vector3.Lerp(rigidbody.velocity, toVelocity, 0.8f);
-		}
-	} */
 
 	public override void SetupWheels()
 	{
@@ -192,38 +175,38 @@ public class PlayerCar : AbstractCar {
 
 	public override void Throttle_Physics(float deltaY)
 	{
-		//engineRPM = colliders[3].rpm * GearRatios[gear-1];			
 		float airDrag = speed_MPS * speed_MPS * 0.3f * wheelRadius;		// Calculate air resistance.
 
 		engineRPM = 5000.0f;
 		engineTorque = LookupTorqueCurve(engineRPM);
 
 		UpdateCurrentState();
-		if(currentState == State.Stop)	// Stop state
-		{
+		if(currentState == State.Stop)	
+		{	// Stop state
 			if(deltaY >= 0.05f)
 			{
 				gear = ShiftGear(speed_KMP);			
 				wheelTorque = ((engineTorque * deltaY) * GearRatios[gear-1] - airDrag) * 0.25f;
-			}else if(deltaY <= -0.05f)
+			}
+			else if(deltaY <= -0.05f)
 			{
 	 			gear = GearRatios.Length;
 				wheelTorque = -((engineTorque * deltaY) * GearRatios[gear-1]- airDrag) * 0.25f;			
-			}else{
+			}else
+			{
 				gear = 0;
 				wheelTorque = 0.0f;				
 			}
-		}else if(currentState == State.Reverse)	// Reverse state
-		{
-//			if(deltaY <= 0.0f){
-	 			gear = GearRatios.Length;
-				wheelTorque = -((engineTorque * deltaY) * GearRatios[gear-1]- airDrag) * 0.25f;		
-//			}
-		}else{	// Forward state
-//			if(deltaY >= 0.0f){
-				gear = ShiftGear(speed_KMP);			
-				wheelTorque = ((engineTorque * deltaY) * GearRatios[gear-1] - airDrag) * 0.25f;
-//			}
+		}
+		else if(currentState == State.Reverse)	
+		{	// Reverse state
+ 			gear = GearRatios.Length;
+			wheelTorque = -((engineTorque * deltaY) * GearRatios[gear-1]- airDrag) * 0.25f;		
+		}
+		else
+		{	// Forward state
+			gear = ShiftGear(speed_KMP);			
+			wheelTorque = ((engineTorque * deltaY) * GearRatios[gear-1] - airDrag) * 0.25f;
 		}
 
 		for(int i=0; i<wheels.Length; i++)
@@ -232,7 +215,8 @@ public class PlayerCar : AbstractCar {
 
 	public override void Brake_Physics()
 	{
-		if(braked){
+		if(braked)
+		{
 			for(int i=0; i<wheels.Length; i++)
 			{
 				if(wheels[i].canSteer)
@@ -240,7 +224,8 @@ public class PlayerCar : AbstractCar {
 				else
 					wheels[i].collider.brakeTorque = brakeForce;
 			}
-		}else
+		}
+		else
 		{
 			for(int j=0; j<wheels.Length; j++)
 			{
@@ -270,12 +255,6 @@ public class PlayerCar : AbstractCar {
 			{	// Grounded.
 				wheels[i].model.position = new Vector3(wheelColliders[i].position.x, 
 					hit.point.y + Vector3.Dot(wheelColliders[i].up, Vector3.up) * wheelRadius, wheelColliders[i].position.z);
-
-				/*if(i==0)
-				{
-					string s = string.Format("forwardSlip: {0:F3}, sidewaySlip: {1:F3}   {2:F5}", hit.forwardSlip, hit.sidewaysSlip, hit.force / wheels[i].collider.suspensionSpring.spring);
-					print(s);
-				}*/
 
 				// Create skidmark and emit smoke if skidding.
 				if(!isRemoteControlled && skidmark && skidSmoke)
@@ -387,8 +366,7 @@ public class PlayerCar : AbstractCar {
 		 	stream.Serialize(ref pos);
 		}
 		else
-		{
-		 	// Receiving data
+		{	// Receiving data
 		 	stream.Serialize(ref delX);
 		 	stream.Serialize(ref delY);
 		 	stream.Serialize(ref headLitsOn);
@@ -418,16 +396,9 @@ public class PlayerCar : AbstractCar {
 		 		else
 		 		{
 	 			 	if((rigidbody.velocity - vel).sqrMagnitude > 0.5f)	// Only update our data when it's larger than theadshold to avoid shaking.
-	 			 	{
-	 				 	// toVelocity = vel;
 	 				 	rigidbody.velocity = Vector3.Lerp(rigidbody.velocity, vel, Time.deltaTime);
-	 			 	}
 	 			 	if(Quaternion.Angle(rigidbody.rotation, rot) > 5.0f)	// Only update our data when it's larger than theadshold to avoid shaking.
-	 			 	{
-	 			 		// toRotation = rot;
 	 			 		rigidbody.rotation = Quaternion.Lerp(rigidbody.rotation, rot, Time.deltaTime);
-	 			 	}
-		 			// toPosition = pos;		 				 			
 		 			rigidbody.position = Vector3.Lerp(rigidbody.position, pos, Time.deltaTime);
 		 		}
 		 	}

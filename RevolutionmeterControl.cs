@@ -40,14 +40,11 @@ public class RevolutionmeterControl : MonoBehaviour {
 		{
 			timer = 0.0f;
 			if(gear == 0)
-			{
 				gearText = "N";
-			}else if(gear == 7)
-			{
+			else if(gear == 7)
 				gearText = "R";
-			}else{
+			else
 				gearText= string.Format("{0:D}", gear);
-			}
 		}			
 	}
 
